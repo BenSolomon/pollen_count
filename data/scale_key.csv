@@ -1,0 +1,17 @@
+group,scale,min,max
+tree,low,0,14
+tree,moderate,15,89
+tree,high,90,1499
+tree,very high,1500,
+grass,low,0,4
+grass,moderate,5,19
+grass,high,20,199
+grass,very high,200,
+weed,low,0,9
+weed,moderate,10,49
+weed,high,50,499
+weed,very high,500,
+mold,low,0,6499
+mold,moderate,6500,12999
+mold,high,13000,49999
+mold,very high,50000,

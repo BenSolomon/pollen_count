@@ -1,0 +1,65 @@
+species,group
+Acer (maple incl. box elder),tree
+A Ambrosia/Franseria (ragweed),weed
+A Artemesia (sage),tree
+A Compositae (aster family exc. Ragweed),weed
+Alnus (alder),tree
+Betulaceae (birch and look alikes),tree
+Chenopodiaceae/Amaranthaceae,weed
+Cupressaeae (incl. juniper/cedars),tree
+Cyperaceae (sedges),grass
+Fabaceae (legume=Acacia),tree
+F Fagus (beech),tree
+F Quercus (oak),tree
+H Liquidambar (sweet gum),tree
+"J Carya (hickory, pecan)",tree
+"J Juglans (walnut, butternut)",tree
+M Morus (mulberry),tree
+Myrtaceae (Eucalyptus family),tree
+O Fraxinus (ash),tree
+O Ligustrum (Privet),tree
+O Olea (olive),tree
+Pinus (pine and look alikes),tree
+Plantago (English Plantain),tree
+Platanus (sycamore),tree
+Poaceae Graminae (grasses),grass
+"Polyg Rumex (sheep sorrel, dock)",grass
+"S Populus (poplar, cottonwood)",tree
+S Salix (willow),tree
+Typha (cattail),weed
+Ulmus (elm),tree
+Urtica (nettle),weed
+Unidentified pollen ,tree
+Other Pollen ,tree
+Chinese Pistasche,tree
+Tanbark Oak,tree
+Alternaria,mold
+Ascospores,mold
+Basidiospores,mold
+Botrytis,mold
+Cercospora,mold
+Cladosporium,mold
+Curvularia,mold
+Drechslera/Helminthosporium,mold
+Epicoccum,mold
+Fusarium,mold
+Nigrospora,mold
+Oidium/Erysiphe,mold
+Penicillium/Aspergillus,mold
+Periconia,mold
+Peronospora,mold
+Pestalotia,mold
+Pithomyces,mold
+Polythrincium,mold
+Rusts,mold
+Smuts/Myxomycetes,mold
+Stemphylium,mold
+Torula,mold
+Unidentified Fungi,mold
+Other Fungi,mold
+Algae,mold
+Beltrania,mold
+Coprinus,mold
+Ganoderma,mold
+Telletia,mold
+Chaetomium,mold
