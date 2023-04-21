@@ -42,25 +42,55 @@ df <- tibble(file = list.files(here("data/pollen_data/"))) %>%
   group_by(group, date, file) %>%
   summarise(count = sum(count, na.rm = T))
 
-ggpollen <- function(df, grouping, max){
+ggpollen <- function(grouping){
+  scale_df <- readr::read_csv(here("data/scale_key.csv")) %>%
+    filter(group == grouping)
+
+  max <- scale_df %>%
+    filter(scale == "very high") %>%
+    mutate(max = min * 1.1) %>%
+    pull(max)
+
+  annotation_layers <- scale_df %>%
+    mutate(color = case_when(
+      scale == "low" ~"green",
+      scale == "moderate" ~ "yellow",
+      scale == "high" ~ "red",
+      scale == "very high" ~ "purple",
+    )) %>%
+    mutate(layer = purrr::pmap(
+      list(min, max, color),
+      function(min, max, color){
+        if (is.na(max)) {max <- Inf}
+        annotate("rect", ymin=min, ymax=max,
+                 xmin=as.POSIXct(-Inf), xmax=as.POSIXct(Inf),
+                 fill = color, alpha = 0.2)
+
+      }
+    ))
+
+
   df %>% filter(group == grouping) %>%
   ggplot(aes(x = date, y = count, group = group))+
+    annotation_layers$layer +
     geom_path()+
-    scale_y_continuous(limits = c(0,max)) +
-    theme_classic() +
-    ggtitle(grouping)
+    scale_y_sqrt(limits = c(0,max)) +
+    theme_bw() +
+    ggtitle(stringr::str_to_title(grouping)) +
+    labs(x="", y="Count")
+
 }
 
-plt <- ggpollen(df, "tree", 1500)
-layer_scales(plt)$x$range$range
+# annotate("rect", ymax=1000,ymin=500,
+#          xmin=as.POSIXct(-Inf), xmax=as.POSIXct(Inf),
+#          fill = "red", alpha = 0.2)
 
+plt <- ggpollen("tree")
 
-df2 <- readr::read_csv(here("data/scale_key.csv")) %>%
-  filter(scale == "very high") %>%
-  mutate(max = min * 1.1) %>%
-  mutate(plot = purrr::map2(group, max, function(g,m) ggpollen(df, g, m)))
+df2 <- tibble(group = c("tree", "grass", "weed", "mold")) %>%
+  mutate(plot = purrr::map(group, function(g) ggpollen(g)))
 
-df2$plot[1]
+# df2$plot[1]
 
 cowplot::plot_grid(plotlist = df2$plot)
 
