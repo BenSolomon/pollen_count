@@ -34,15 +34,17 @@ parse_pollen_xlsx <- function(path){
 }
 
 
-df <- tibble(file = list.files(here("data/pollen_data/"))) %>%
-  mutate(path = here(sprintf("data/pollen_data/%s", file))) %>%
-  mutate(data = purrr::map(path, ~suppressMessages(parse_pollen_xlsx(.)))) %>%
-  tidyr::unnest(data) %>%
-  distinct() %>%
-  group_by(group, date, file) %>%
-  summarise(count = sum(count, na.rm = T))
+# df <- tibble(file = list.files(here("data/pollen_data/"))) %>%
+#   mutate(path = here(sprintf("data/pollen_data/%s", file))) %>%
+#   mutate(data = purrr::map(path, ~suppressMessages(parse_pollen_xlsx(.)))) %>%
+#   tidyr::unnest(data) %>%
+#   distinct() %>%
+#   group_by(group, date, file) %>%
+#   summarise(count = sum(count, na.rm = T))
 
-ggpollen <- function(grouping){
+ggpollen <- function(data, grouping){
+  data <- data %>% ungroup() %>% filter(group == grouping)
+
   scale_df <- readr::read_csv(here("data/scale_key.csv")) %>%
     filter(group == grouping)
 
@@ -62,18 +64,18 @@ ggpollen <- function(grouping){
       list(min, max, color),
       function(min, max, color){
         if (is.na(max)) {max <- Inf}
-        annotate("rect", ymin=min, ymax=max,
-                 xmin=as.POSIXct(-Inf), xmax=as.POSIXct(Inf),
+        annotate("rect", ymin=min, ymax=max+1,
+                 xmin=as.POSIXct(-Inf),
+                 xmax=as.POSIXct(Inf),
                  fill = color, alpha = 0.2)
 
       }
     ))
 
-
-  df %>% filter(group == grouping) %>%
-  ggplot(aes(x = date, y = count, group = group))+
+  ggplot(data, aes(x = date, y = count, group = group))+
     annotation_layers$layer +
     geom_path()+
+    geom_point()+
     scale_y_sqrt(limits = c(0,max)) +
     theme_bw() +
     ggtitle(stringr::str_to_title(grouping)) +
@@ -85,12 +87,12 @@ ggpollen <- function(grouping){
 #          xmin=as.POSIXct(-Inf), xmax=as.POSIXct(Inf),
 #          fill = "red", alpha = 0.2)
 
-plt <- ggpollen("tree")
-
-df2 <- tibble(group = c("tree", "grass", "weed", "mold")) %>%
-  mutate(plot = purrr::map(group, function(g) ggpollen(g)))
-
-# df2$plot[1]
-
-cowplot::plot_grid(plotlist = df2$plot)
+# plt <- ggpollen(df, "tree")
+# #
+# df2 <- tibble(group = c("tree", "grass", "weed", "mold")) %>%
+#   mutate(plot = purrr::map(group, function(g) ggpollen(df, g)))
+# #
+# # # df2$plot[1]
+# #
+# cowplot::plot_grid(plotlist = df2$plot)
 

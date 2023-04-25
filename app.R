@@ -1,51 +1,52 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
+library(shinythemes)
+library(here)
+source("pollen_functions.R")
 
-# Define UI for application that draws a histogram
-ui <- fluidPage(
+df <- tibble(file = list.files(here("data/pollen_data/"))) %>%
+    mutate(path = here(sprintf("data/pollen_data/%s", file))) %>%
+    mutate(data = purrr::map(path, ~suppressMessages(parse_pollen_xlsx(.)))) %>%
+    tidyr::unnest(data) %>%
+    distinct() %>%
+    group_by(group, date, file) %>%
+    summarise(count = sum(count, na.rm = T))
 
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
+df <- tibble(group = c("tree", "grass", "weed", "mold")) %>%
+    mutate(plot = purrr::map(group, function(g) ggpollen(df, g)))
 
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
-    )
+header_tag <- tags$head(
+    # includeHTML("google-analytics.js"),
+    tags$style(HTML("
+                        #test {
+                          padding: 100px;
+                        }
+                        .navbar {
+                          margin: 0px;
+                        }
+                        .footer {
+                            position: relative;
+                            left: 0;
+                            bottom: 0;
+                            width: 100%;
+                            background-color: #d7dfea;
+                            # color: white;
+                            text-align: center;
+                        }
+                        "))
 )
 
-# Define server logic required to draw a histogram
+
+ui <- navbarPage("Pollen", theme = shinytheme("flatly"), header = header_tag,
+    tabPanel("Pollen", id = "pollen",
+        fluidRow(
+            plotOutput("pollen"))
+        ))
+
 server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
+    output$pollen <- renderPlot({
+        cowplot::plot_grid(plotlist = df$plot)
     })
 }
 
-# Run the application 
+# Run the application
 shinyApp(ui = ui, server = server)
